@@ -6,9 +6,9 @@ import {
 	CardTitle
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { useGetApps } from "@/hooks/auth-hooks"
+import { useGetApps, useLogout } from "@/hooks/auth-hooks"
 import { useAuthStore } from "@/stores/auth-store"
-import { Loader2, ExternalLink } from "lucide-react"
+import { Loader2, ExternalLink, LogOut } from "lucide-react"
 
 interface App {
 	key: string
@@ -21,12 +21,12 @@ interface AppSelectorProps {
 }
 
 export function AppSelector({ onAppSelect }: AppSelectorProps) {
-	const { user, clearAuth } = useAuthStore()
+	const { user } = useAuthStore()
 	const { data: apps, isLoading, error } = useGetApps()
+	const { mutate: logout, isPending: isLoggingOut } = useLogout()
 
 	const handleLogout = () => {
-		clearAuth()
-		window.location.reload()
+		logout()
 	}
 
 	if (isLoading) {
@@ -72,10 +72,13 @@ export function AppSelector({ onAppSelect }: AppSelectorProps) {
 			<Card className="w-full max-w-lg">
 				<CardHeader className="text-center">
 					<CardTitle className="text-2xl font-bold">
-						Hoş geldiniz, {user?.username}!
+						Merhaba, {user?.username}!
 					</CardTitle>
 					<CardDescription>
-						Hangi uygulamaya giriş yapmak istiyorsunuz?
+						Giriş yapmak istediğiniz uygulamaya tıklayın.
+					</CardDescription>
+					<CardDescription className="text-slate-400">
+						[temporary page by claude sonnet 4]
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
@@ -123,8 +126,19 @@ export function AppSelector({ onAppSelect }: AppSelectorProps) {
 							onClick={handleLogout}
 							variant="ghost"
 							className="w-full text-muted-foreground"
+							disabled={isLoggingOut}
 						>
-							Çıkış Yap
+							{isLoggingOut ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Çıkış yapılıyor...
+								</>
+							) : (
+								<>
+									<LogOut className="mr-2 h-4 w-4" />
+									Çıkış Yap
+								</>
+							)}
 						</Button>
 					</div>
 				</CardContent>

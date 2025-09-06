@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { loginUser, signupUser, authorizeApp, getApps, type LoginRequest, type SignupRequest } from '@/services/api'
+import { loginUser, signupUser, authorizeApp, getApps, logoutUser, type LoginRequest, type SignupRequest } from '@/services/api'
 import { useAuthStore } from '@/stores/auth-store'
 import { toast } from 'sonner'
 
@@ -72,5 +72,34 @@ export function useGetApps() {
       throw new Error(result.data.result?.message || 'Failed to fetch apps')
     },
     retry: false
+  })
+}
+
+export function useLogout() {
+  const { clearAuth } = useAuthStore()
+  
+  return useMutation({
+    mutationFn: () => logoutUser(),
+    onSuccess: (result) => {
+      clearAuth()
+      if (result.status === 200 && result.data.result?.success) {
+        toast.success('Başarıyla çıkış yapıldı')
+      } else {
+        toast.success('Çıkış yapıldı') // Still clear auth even if server request failed
+      }
+      // Reload the page to reset all state
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
+    },
+    onError: (error) => {
+      // Even if the server request fails, we should still clear local auth
+      clearAuth()
+      toast.success('Çıkış yapıldı')
+      console.error('Logout error:', error)
+      setTimeout(() => {
+        window.location.reload()
+      }, 500)
+    }
   })
 }

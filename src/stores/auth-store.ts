@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { setCookie, getCookie, deleteCookie } from '@/lib/utils'
+import { setCookie, deleteCookie } from '@/lib/utils'
 
 interface AuthStore {
   refresh_token: string | undefined
