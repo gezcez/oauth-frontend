@@ -13,6 +13,7 @@ import { Loader2 } from 'lucide-react'
 export  default function App() {
   const [searchParams] = useSearchParams()
   const app_key = searchParams.get('app')
+  const t = searchParams.get('t')
   const redirect_uri = searchParams.get('redirect_uri')
   const [selectedApp, setSelectedApp] = useState<string | null>(app_key)
   
@@ -27,7 +28,9 @@ export  default function App() {
     if (shouldAuthorize && refresh_token && authorizeData) {
       // The backend already provides a complete redirect_uri with token included
       const responseRedirectUri = authorizeData?.redirect_uri
-      
+      if (Date.now()-(parseInt(t || '0')) < 5000) {
+        return
+      }
       if (responseRedirectUri) {
         // Use the redirect_uri from the response as it already has the token
         setTimeout(() => {
